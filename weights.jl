@@ -76,13 +76,16 @@ function _getedges(f::GeoJSON.Feature)
     return _getedges(f.geometry)
 end
 
-function _getedges(f::MultiPolygon)
-    edges::Array{Array{Float64, 1}, 1} = [[]]
+function _getedges(f::Polygon)
+    edges = Array(Float64, 1)
     for r in f.coordinates
         for (i,pt) in enumerate(r[1:end-1])
-            [r[i], r[i+1]] in edges || insert!(edges, [r[i], r[i+1]], 1)
+            edge = reshape([r[i]; r[i+1]], (4,1))
+            if !(edge in [edges[i,:] for i in 1:size(edges)[1]])
+                edges = vcat(edges, edge)
+            end
         end
     end
     return edges
 end
-_getedges(f::Polygon) = _getedges(f::MultiPolygon)
+_getedges(f::MultiPolygon) = _getedges(f::Polygon)
