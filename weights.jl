@@ -17,10 +17,11 @@ end
 
 function neighbors(fc::GeoJSON.FeatureCollection;
                    kind::AbstractString="queen",
-                   idfield::AbstractString="")
+                   idfield::AbstractString="",
+                   significand::Int64=5)
     results = Dict()
 
-    #indexing step
+    #index & clean step
     for (i,f) in enumerate(fc.features)
         if idfield != ""
             fc.features[i].id = f.properties[idfield]
@@ -34,13 +35,14 @@ function neighbors(fc::GeoJSON.FeatureCollection;
     for (i,f) in enumerate(fc.features)
         toadd = []
         id = f.id
-        candidates = filter(s -> _bbints(bbox(f), bbox(s)) && s != f, fc.features)
+        truncated_i = 
+        candidates = filter(s -> crosses(bbox(f), bbox(s)) && s.id!=id, fc.features)
         for c in candidates
             j = c.id
             addin = false
             if lowercase(kind) == "queen"
-                cpts = _getcoords(c)
-                for pt in _getcoords(f)
+                cpts = [trunc(a, significand) for a in _getcoords(c)]
+                for pt in [trunc(a, significand) for a in _getcoords(f)]
                     if pt in cpts && !(j in toadd)
                         append!(toadd, [j])
                     end
@@ -66,7 +68,7 @@ function _getcoords(f::GeoJSON.Feature)
 end
 
 function _getcoords(f::Polygon)
-    return Set([p for p in f.coordinates[1]])
+    return [p for p in f.coordinates[1]]
 end
 #_getcoords(f::MultiPolygon) = _getcoords(f::Polygon)
 
