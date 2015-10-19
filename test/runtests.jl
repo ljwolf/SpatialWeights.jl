@@ -16,12 +16,20 @@ pyrooks = [k+1 => [i+1 for i in v] for (k,v) in pyrooks]
 queens = neighbors(GeoJSON.parsefile(json_path), significand=4)
 rooks = neighbors(GeoJSON.parsefile(json_path), kind="rook", significand=4)
 
+facts("Queen Contiguity") do
 for (k,v) in queens
-    allin = all([n in pyqueens[k] for n in v])
-    noneout = all([n in v for n in pyqueens[k]])
-    @fact allin && noneout --> true
+    allin = reduce(&, [n in pyqueens[k] for n in v])
+    noneout = reduce(&, [n in v for n in pyqueens[k]])
+    r = allin && noneout
+    @fact r --> true "Neighbor set different for $k"
+end
+end
 
+facts("Rook Contiguity") do
 for (k,v) in rooks
-    allin = all([n in pyrooks[k] for n in v])
-    noneout = all([n in v for n in pyrooks[k]])
-    @fact allin && noneout --> true
+    allin = reduce(&, [n in pyrooks[k] for n in v])
+    noneout = reduce(&, [n in v for n in pyrooks[k]])
+    r = allin && noneout
+    @fact r --> true "Neighbor set different for $k"
+end
+end
