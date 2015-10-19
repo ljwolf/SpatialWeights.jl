@@ -7,11 +7,6 @@ using bboxer
 type Weights
     features::GeoJSON.FeatureCollection
     kind::AbstractString
-
-    #function neighbors(fc::GeoJSON.FeatureCollection;
-    #                   kind::AbstractString="queen")
-    #    return neighbors(features;kind=kind)
-    #end
 end
 
 
@@ -48,8 +43,10 @@ function neighbors(fc::GeoJSON.FeatureCollection;
                     end
                 end
             elseif lowercase(kind) == "rook"
-                cedges = _getedges(c)
-                for edge in _getedges(f)
+                cedges = [trunc(a, significand) for a in _getedges(c)]
+                flipped = [reshape([s[3:4];s[1:2]], (1,4)) for s in cedges]
+                cedges = vcat(cedges, flipped) #need both cw and ccw
+                for edge in [trunc(a, significand) for a in _getedges(f)]
                     if edge in cedges && !(j in toadd)
                         append!(toadd, [j])
                     end
@@ -77,15 +74,21 @@ function _getedges(f::GeoJSON.Feature)
 end
 
 function _getedges(f::Polygon)
-    edges = Array(Float64, 1)
+    edges = Array(Float64, (1,4))
+    updated = false
     for r in f.coordinates
         for (i,pt) in enumerate(r[1:end-1])
-            edge = reshape([r[i]; r[i+1]], (4,1))
+            edge = reshape([r[i]; r[i+1]], (1,4))
             if !(edge in [edges[i,:] for i in 1:size(edges)[1]])
-                edges = vcat(edges, edge)
+                if updated
+                    edges = vcat(edges, edge)
+                else
+                    edges = edge
+                    updated = true
+                end
             end
         end
     end
-    return edges
+    return [edges[i,:] for i in 1:size(edges)[1]]
 end
 _getedges(f::MultiPolygon) = _getedges(f::Polygon)
