@@ -1,18 +1,20 @@
 using PyCall,SpatialWeights,FactCheck
-
-shp_path = joinpath(dirname(@__FILE__),"columbus.shp")
-json_path = joinpath(dirname(@__FILE__),"columbus.json") 
-
 @pyimport pysal
-pyqueens = pysal.queen_from_shapefile(shp_path)
-pyqueens = queens[:neighbors]
-pyqueens = [k+1 => [i+1 for i in v] for (k,v) in queens]
-pyrooks = pysal.rook_from_shapefile(shp_path)
-pyrooks = rooks[:neighbors]
-pyrooks = [k+1 => [i+1 for i in v] for (k,v) in rooks]
 
-queens = neighbors(GeoJSON.parsefile(json_path), 4)
-rooks = neighbors(GeoJSON.parsefile(json_path), kind="rook", 4)
+shp_path = pysal.examples[:get_path]("columbus.shp")#joinpath(dirname(@__FILE__),"columbus.shp")
+json_path = pysal.examples[:get_path]("columbus.json")#joinpath(dirname(@__FILE__),"columbus.json") 
+println(shp_path)
+println(json_path)
+
+pyqueens = pysal.queen_from_shapefile(shp_path)
+pyqueens = pyqueens[:neighbors]
+pyqueens = [k+1 => [i+1 for i in v] for (k,v) in pyqueens]
+pyrooks = pysal.rook_from_shapefile(shp_path)
+pyrooks = pyrooks[:neighbors]
+pyrooks = [k+1 => [i+1 for i in v] for (k,v) in pyrooks]
+
+queens = neighbors(GeoJSON.parsefile(json_path), significand=4)
+rooks = neighbors(GeoJSON.parsefile(json_path), kind="rook", significand=4)
 
 for (k,v) in queens
     allin = all([n in pyqueens[k] for n in v])
