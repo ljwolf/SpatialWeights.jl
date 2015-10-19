@@ -1,8 +1,6 @@
 #conceptually, the binning algorithm works by dividing the shapefile into a 
 #b x b grid, where b is the number of bins. 
 using GeoJSON
-using bboxer
-
 
 type Weights
     features::GeoJSON.FeatureCollection
@@ -92,3 +90,4 @@ function _getedges(f::Polygon)
     return [edges[i,:] for i in 1:size(edges)[1]]
 end
 _getedges(f::MultiPolygon) = _getedges(f::Polygon)
+
