@@ -23,5 +23,4 @@ install:
   - pip install pysal
 
 script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - julia -e 'Pkg.clone(pwd()); Pkg.build("SpatialWeights"); Pkg.test("SpatialWeights"; coverage=true)'
