@@ -10,8 +10,8 @@ feaure collection.
 Priorities
 ------------
 1. <s>add some kind of tolerance/snapping to improve results</s>
-2. validate <s>Queen</s>, <s>Rook</s> against [PySAL](https://github.com/pysal/pysal)
-3. Write testing framework against pysal using pycall
+2. <s>validate Queen, Rook> against [PySAL](https://github.com/pysal/pysal)</s>
+3. <s>Write testing framework against pysal using pycall</s>
 3. <s>Implement full binning</s>
 4. Write/find dict to matrix function to convert dict mapping to weights
 5. Move past contiguity. 
