@@ -2,6 +2,6 @@ module SpatialWeights
 
 include(joinpath(dirname(@__FILE__), "weights.jl"))
 
-export neighbors, Weights
+export neighbors, Wmatrix
 
 end # module

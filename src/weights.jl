@@ -192,3 +192,42 @@ function _crosses(ref::Array{Int64,1}, new::Array{Int64,1})
     return _crosses(float(ref), float(new))
 end
 
+"""Construct a weights matrix"""
+function Wmatrix(ndict::Dict; 
+                 sparse::Bool=false,
+                 standardize::Bool=false)
+    n = length(ndict)
+    if sparse
+        Wmat = spzeros(n,n) #because zeros allocates non-floats
+    else
+        Wmat = zeros(Float64, (n,n))
+    end
+    for (i,(k,v)) in enumerate(ndict)
+        if standardize
+            denominator = length(v)
+        else
+            denominator = 1
+        end
+        if isinteger(k)
+            i=k
+        end
+        Wmat[i,v] = 1 / denominator
+    end
+    return Wmat
+end
+
+function Wmatrix(fc::GeoJSON.FeatureCollection;
+                   kind::AbstractString="queen",
+                   idfield::AbstractString="",
+                   significand::Int64=5,
+                   sparse::Bool=false,
+                   standardize::Bool=false)
+    results = neighbors(fc, 
+                        kind=kind, 
+                        idfield=idfield, 
+                        significand=significand)
+    results = Wmatrix(results, 
+                      sparse=sparse,
+                      standardize=standardize)
+    return results
+end
