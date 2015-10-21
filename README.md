@@ -13,5 +13,5 @@ Priorities
 2. <s>validate Queen, Rook> against [PySAL](https://github.com/pysal/pysal)</s>
 3. <s>Write testing framework against pysal using pycall</s>
 3. <s>Implement full binning</s>
-4. Write/find dict to matrix function to convert dict mapping to weights
+4. <s>Write/find dict to matrix function to convert dict mapping to weights</s>
 5. Move past contiguity. 
