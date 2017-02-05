@@ -2,10 +2,41 @@
 #b x b grid, where b is the number of bins. 
 using GeoJSON
 
-type Weights
+abstract Weights 
+
+#maybe this would do better as an abstract class. 
+type ContiguityWeights <: Weights 
     features::GeoJSON.FeatureCollection
-    kind::AbstractString
+    kind::AbstractString #this is duplicated in the class definition
+    idfield::AbstractString
+    significand::Int64
+    sparse::Bool #this is in the class definition
+    standardize::Bool
+    ndict::Dict
+    matrix::Array{Float64,2}
+    
+    Weights(features, kind, idfield, 
+            significand, sparse, standardize) = new(features, kind, 
+                                                    idfield, significand, sparse,
+                                                    standardize, 
+                                                    neighbors(features, kind=kind, 
+                                                           idfield=idfield,
+                                                           significand=significand), 
+                                                    Wmatrix(features,kind=kind,
+                                                            idfield=idfield,
+                                                            significand=significand,
+                                                            sparse=sparse,
+                                                            standardize=standardize))
 end
+
+WeightsQ(features) = Weights(features, "queen", "", 5, false, true)
+WeightsR(features) = Weights(features, "rook", "", 5, false, true)
+spWeightsQ(features) = Weights(features, "rook", "", 5, true, true)
+spWeightsR(features) = Weights(features, "rook", "", 5, true, true)
+
+#Weights(features) = Weights(features, kind="queen", idfield="",
+#significand=5, sparse=false, standardize=true, ndict=neighbors(features), matrix=Wmatrix(features, standardize=true))
+
 
 """Consruct contiguity weights from a GeoJSON feature collection"""
 function neighbors(fc::GeoJSON.FeatureCollection;
@@ -231,3 +262,13 @@ function Wmatrix(fc::GeoJSON.FeatureCollection;
                       standardize=standardize)
     return results
 end
+
+function standardize!(W::Weights)
+    W.matrix = W.matrix ./ sum(W.matrix, 2)
+end
+
+function standardize(W::Weights)
+    Wnew = copy(W)
+    standardize!(Wnew)
+end
+    
